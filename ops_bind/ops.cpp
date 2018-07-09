@@ -45,6 +45,19 @@ namespace ops {
 			return;
 		}
 
+		/// alloc
+		try
+		{
+			if (self->data == nullptr) {
+				self->data = std::shared_ptr<T>(new T[dataSize]);
+			}
+		}
+		catch (const std::exception&)
+		{
+			printf("Error: OOM when allocate %s, size %.2fMB\n", self->name.c_str(), dataSize/1024.0/1024.0);
+			return;
+		}
+
 		self->dataSize = dataSize;
 		self->is_initialized = true;
 	}
@@ -65,23 +78,12 @@ namespace ops {
 			return;
 		}
 
-		/// 计算矩阵全部长度
-		size_t n = 1;
-		for (size_t i = 0; i < lhs->shape.size(); ++i) {
-			n *= lhs->shape[i];
-		}
-
-		/// xxxxx
-		if (self->data == nullptr) {
-			self->data = std::shared_ptr<T>(new T[n]);
-		}
-
 		/// 实际计算
 		T * res = self->data.get();
 		T * lv = lhs->data.get();
 		T * rv = rhs->data.get();
 
-		for (size_t i = 0; i < n; ++i) {
+		for (size_t i = 0; i < self->dataSize; ++i) {
 			res[i] = lv[i] + rv[i];
 		}
 
