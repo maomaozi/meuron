@@ -50,6 +50,7 @@ inline Var<DataType>::Var(const std::vector<int>& initShape, std::string name)
 
 #endif // DEBUG
 
+	_node->has_data = true;
 }
 
 
