@@ -20,7 +20,6 @@ public:
 
 protected:
 	dataType realType;
-	std::vector<int> _shape;
 };
 
 

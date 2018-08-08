@@ -38,8 +38,6 @@ inline Var<DataType>::Var(const std::vector<int>& initShape, std::string name)
 
 	///  新创建节点时为其分配内存
 	_node->data = std::shared_ptr<DataType>(new DataType[dataSize], [](void *p) { delete [] p; });
-
-	_shape = initShape;
 }
 
 
