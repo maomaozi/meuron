@@ -123,8 +123,10 @@ inline opNode<DataType> * Var<DataType>::getNode() {
 
 
 template<typename DataType>
-inline opNode<DataType>& Var<DataType>::operator+(Var<DataType>& rhsObj) // ?
+inline Var<DataType> Var<DataType>::operator+(Var<DataType>& rhsObj) // ?
 {
 	opNode<DataType> &res = *_node + *rhsObj._node; 
-	return res;
+
+	return Var<DataType>(res);
+	//return res;
 }

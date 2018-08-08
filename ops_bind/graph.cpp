@@ -10,7 +10,6 @@ inline void Graph::finalize()
 	}
 
 	///首先处理图的计算层级模型
-
 	std::unordered_set<__Node*> needToProcess;
 	std::unordered_set<__Node*> alreadyProcessed;
 	alreadyProcessed.insert(static_cast<__Node*>(nullptr));
@@ -25,12 +24,24 @@ inline void Graph::finalize()
 	}
 
 	/// 从第0层开始遍历
-	for (__Node* ptr : nodesLevels[0]) { 
+	for (__Node* ptr : nodesLevels[0]) 
+	{ 
 		/// 首先获取完全无类型(不知道是什么Tensor也不知道数据类型)的Tensor
 		/// 然后取出其中的_node(不知道什么类型的opNode)
-		__Node* node = ptr->fetchNext();
-		if(node)
+		/* __Node* node = ptr->fetchNext();
+
+		if (node)
 			needToProcess.insert(ptr->fetchNext());
+		*/
+
+		auto &nodes = ptr->fetchNext();
+		//needToProcess.insert(nodes.begin(), nodes.end());
+
+		for (auto &item : nodes)
+		{
+			needToProcess.insert(item.get());
+		}
+		
 	}
 
 	size_t curLayerCnt = 1;
@@ -48,9 +59,18 @@ inline void Graph::finalize()
 		}
 
 		for (__Node* n : curLayer) {
+			/*
 			__Node* node = n->fetchNext();
 			if (node)
 				needToProcess.insert(node);
+			*/
+
+			auto &nodes = n->fetchNext();
+			// needToProcess.insert(nodes.begin(), nodes.end());
+			for (auto &item : nodes)
+			{
+				needToProcess.insert(item.get());
+			}
 
 			needToProcess.erase(n);
 			alreadyProcessed.insert(n);

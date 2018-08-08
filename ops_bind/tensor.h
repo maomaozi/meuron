@@ -8,6 +8,7 @@ template <typename T>
 class opNode;
 
 /// 无模板参数基类用来做类型擦除
+/// Tensor 是对用户视图类型的抽象
 class Tensor {
 public:
 	Tensor() {};
@@ -36,6 +37,7 @@ private:
 	opNode<DataType>* _node;
 };
 
+
 template <typename DataType>
 class Var : public Tensor {
 public:
@@ -58,7 +60,8 @@ public:
 
 public:
 	/// 当作为统一包装器时，应该转发计算
-	opNode<DataType> &operator+(Var<DataType> &rhsObj);
+	//opNode<DataType> &operator+(Var<DataType> &rhsObj);
+	Var<DataType> operator+(Var<DataType> &rhsObj);
 
 private:
 	/// 普通指针用来访问对象
@@ -70,6 +73,7 @@ private:
 	/// 由于指针是私有的，所以随着对象析构不可能存在不正确的引用
 	std::shared_ptr<opNode<DataType>> _saver;
 };
+
 
 template <typename DataType>
 class Const : public Tensor{

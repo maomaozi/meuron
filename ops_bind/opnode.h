@@ -7,32 +7,41 @@ namespace ops {
 	class op;
 }
 
+
 class Tensor;
+
 
 template <typename T>
 class Var;
 
+
 template <typename T>
 class Mouth;
+
 
 template <typename T>
 class Const;
 
 /// 无模板类型的基类，为纯虚接口
 /// 主要放一些getters，方便获取某些类型无关属性
+/// __Node 是对内部节点视图的抽象
 class __Node {
 public:
 	virtual const std::string getName() const = 0;
 	virtual const std::vector<int> getShape() const = 0;
 	virtual size_t getDataSize() const = 0;
-	virtual const __Node* getlhsParent() const = 0;
-	virtual const __Node* getrhsParent() const = 0;
-	virtual const __Node* getNext() const = 0;
+
+	virtual const __Node *fetchlhsParent() const = 0;
+	virtual const __Node *fetchrhsParent() const = 0;
+	virtual const std::unordered_set<std::shared_ptr<__Node>> &fetchNext() const = 0;
+
 	virtual __Node* fetchlhsParent() = 0;
 	virtual __Node* fetchrhsParent() = 0;
-	virtual __Node* fetchNext() = 0;
+	virtual std::unordered_set<std::shared_ptr<__Node>> &fetchNext() = 0;
+
 	virtual void execHere() = 0;
 };
+
 
 template <typename T>
 class opNode : public __Node {
@@ -95,17 +104,18 @@ public:
 	const std::vector<int> getShape() const;
 	size_t getDataSize() const;
 
-	const __Node* getlhsParent() const;
-	const __Node* getrhsParent() const;
-	const __Node* getNext() const;
+	// 常量版本
+	const __Node *fetchlhsParent() const;
+	const __Node *fetchrhsParent() const;
+	const std::unordered_set<std::shared_ptr<__Node>> &fetchNext() const;
 
-	__Node* fetchlhsParent();
-	__Node* fetchrhsParent();
-	__Node* fetchNext();
+	__Node *fetchlhsParent();
+	__Node *fetchrhsParent();
+	std::unordered_set<std::shared_ptr<__Node>> &fetchNext();
 
 /// Setters
 public:
-	void setName(std::string name);
+	void setName(const std::string &);
 
 /// 重载的运算符
 public:
@@ -128,7 +138,9 @@ private:
 	opNode<T> * rhs = nullptr;
 
 	std::shared_ptr<T> data = nullptr;			// 指向所保存数据的智能指针
-	std::shared_ptr<opNode<T>> next = nullptr;	// 保存指向下一个节点的智能指针，防止析构
+	//std::shared_ptr<opNode<T>> next = nullptr;	// 保存指向下一个节点的智能指针，防止析构
+	/* 考虑到可能出现有多个后继运算符，所以改为set */
+	std::unordered_set<std::shared_ptr<__Node>> next;
 
 	operator_mono_t func_mono = nullptr;
 	operator_bino_t func_bino = nullptr;

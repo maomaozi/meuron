@@ -97,10 +97,16 @@
 		// 双目bind, 在两个前驱节点上保存后继节点
 		// 如果不保存这个shared_ptr，当函数返回后引用计数为0
 		// 对于流图内部绑定产生的节点，在完成最终属性推断后认为其已经初始化
-		next = std::shared_ptr<opNode<T>>(new opNode<T>(this, &rhsObj, op));
 
-		rhsObj.next = next;
-		return *next;
+		//next = std::shared_ptr<opNode<T>>(new opNode<T>(this, &rhsObj, op));
+		//rhsObj.next = next;
+
+		auto newNode = std::shared_ptr<opNode<T>>(new opNode<T>(this, &rhsObj, op));
+
+		next.insert(newNode);
+		rhsObj.next.insert(newNode);
+
+		return *newNode;
 	}
 
 	template<typename T>
@@ -109,9 +115,11 @@
 		// 单目bind
 		// 处理类似于双目运算
 		// 对于流图内部绑定产生的节点，在完成最终属性推断后认为其已经初始化
-		next = std::shared_ptr<opNode<T>>(new opNode<T>(this, op));
+		//next = std::shared_ptr<opNode<T>>(new opNode<T>(this, op));
+		auto newNode = std::shared_ptr<opNode<T>>(new opNode<T>(this, op));
+		next.insert(newNode);
 
-		return *next;
+		return *newNode;
 	}
 
 	template<typename T>
@@ -144,12 +152,16 @@
 	template<typename T>
 	void opNode<T>::repr()
 	{
-		if (is_initialized) {
-			printf("opNode %s\t%s\n", name.c_str(), vecShape2Str(shape).c_str());
-			if (has_data) {
+		if (is_initialized) 
+		{
+			printf("Node %s\t%s\n", name.c_str(), vecShape2Str(shape).c_str());
+			if (has_data) 
+			{
 				printf("values: ");
-				for (size_t i = 0; i < dataSize; ++i) {
-					std::cout << (int)data.get()[i] << std::endl;
+
+				for (size_t i = 0; i < dataSize; ++i) 
+				{
+					std::cout << data.get()[i] << std::endl;
 				}
 			}
 		}
@@ -233,37 +245,43 @@
 	}
 
 	template<typename T>
-	const __Node* opNode<T>::getlhsParent() const {
+	const __Node* opNode<T>::fetchlhsParent() const
+	{
 		return lhs;
 	}
 
 	template<typename T>
-	const __Node* opNode<T>::getrhsParent() const {
+	const __Node* opNode<T>::fetchrhsParent() const
+	{
 		return rhs;
 	}
 
 	template<typename T>
-	const __Node* opNode<T>::getNext() const {
-		return next.get();
+	const std::unordered_set<std::shared_ptr<__Node>> &opNode<T>::fetchNext() const
+	{
+		return next;
 	}
 
 	template<typename T>
-	__Node* opNode<T>::fetchlhsParent() {
+	__Node *opNode<T>::fetchlhsParent() 
+	{
 		return lhs;
 	}
 
 	template<typename T>
-	__Node* opNode<T>::fetchrhsParent()  {
+	__Node *opNode<T>::fetchrhsParent()  
+	{
 		return rhs;
 	}
 
 	template<typename T>
-	__Node* opNode<T>::fetchNext() {
-		return next.get();
+	std::unordered_set<std::shared_ptr<__Node>> &opNode<T>::fetchNext() 
+	{
+		return next;
 	}
 
 	template<typename T>
-	void opNode<T>::setName(std::string name) 
+	void opNode<T>::setName(const std::string &name) 
 	{
 		this->name = name;
 	}
