@@ -2,6 +2,8 @@
 
 #include "stdafx.h"
 
+//#define USE_CUDA
+
 template <typename T>
 class opNode;
 
@@ -15,12 +17,14 @@ namespace ops {
 		~op() {};
 
 	public:
+
 		template <typename T>
 		static void sum(const opNode<T> *lhs, const opNode<T> *rhs, opNode<T> *self);
 
 		template <typename T>
 		static void sum_deduction_property(const opNode<T> *lhs, const opNode<T> *rhs, opNode<T> *self);
 
-
+		template <typename T>
+		static Var<T> matSum(Tensor &lhs, Tensor &rhs);
 	};
 }

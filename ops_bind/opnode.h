@@ -48,7 +48,6 @@ template <typename T>
 class opNode : public __Node {
 public:
 	friend class ops::op;
-
 	friend class Tensor;
 	friend class Var<T>;
 	friend class Mouth<T>;

@@ -27,9 +27,6 @@
     <ClInclude Include="graph.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="ops.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="opnode.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -40,6 +37,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="types.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ops.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -61,6 +61,9 @@
     </ClCompile>
     <ClCompile Include="utils.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="mat_sum.cpp">
+      <Filter>源文件\ops</Filter>
     </ClCompile>
     <ClCompile Include="ops.cpp">
       <Filter>源文件\ops</Filter>

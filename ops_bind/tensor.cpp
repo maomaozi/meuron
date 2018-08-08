@@ -72,6 +72,7 @@ void Var<DataType>::init(DataType *data, bool is_ref)
 	_node->has_data = true;
 }
 
+
 template<typename DataType>
 void Var<DataType>::init(const std::initializer_list<DataType> &data){
 	if (!_node->is_initialized) {
@@ -120,13 +121,3 @@ inline opNode<DataType> * Var<DataType>::getNode() {
 }
 
 //====================================================
-
-
-template<typename DataType>
-inline Var<DataType> Var<DataType>::operator+(Var<DataType>& rhsObj) // ?
-{
-	opNode<DataType> &res = *_node + *rhsObj._node; 
-
-	return Var<DataType>(res);
-	//return res;
-}

@@ -214,19 +214,6 @@
 	}
 
 	template<typename T>
-	opNode<T> &opNode<T>::operator+(opNode<T> &rhsObj)
-	{
-		// 首先产生正确绑定的新节点
-		opNode<T> &res = bind(rhsObj, ops::op::sum);
-
-		// 然后推断新节点的属性
-		// 包括shape name, 然后认为此节点已经初始化完毕
-		ops::op::sum_deduction_property(this, &rhsObj, &res);
-
-		return res;
-	}
-
-	template<typename T>
 	const std::string &opNode<T>::getName() const
 	{
 		return name;
