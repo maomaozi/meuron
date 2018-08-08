@@ -21,7 +21,6 @@ namespace ops {
 		template <typename T>
 		static void sum_deduction_property(const opNode<T> *lhs, const opNode<T> *rhs, opNode<T> *self);
 
-	private:
 
 	};
 }

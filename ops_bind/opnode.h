@@ -27,8 +27,9 @@ class Const;
 /// __Node 是对内部节点视图的抽象
 class __Node {
 public:
-	virtual const std::string getName() const = 0;
-	virtual const std::vector<int> getShape() const = 0;
+	virtual const std::string &getName() const = 0;
+	virtual const std::vector<int> &getShape() const = 0;
+	virtual bool get_initialized() const = 0;
 	virtual size_t getDataSize() const = 0;
 
 	virtual const __Node *fetchlhsParent() const = 0;
@@ -100,8 +101,9 @@ public:
 
 /// Getters
 public:
-	const std::string getName() const;
-	const std::vector<int> getShape() const;
+	const std::string &getName() const;
+	const std::vector<int> &getShape() const;
+	bool get_initialized() const;
 	size_t getDataSize() const;
 
 	// 常量版本

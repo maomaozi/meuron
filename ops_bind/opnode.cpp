@@ -161,7 +161,7 @@
 
 				for (size_t i = 0; i < dataSize; ++i) 
 				{
-					std::cout << data.get()[i] << std::endl;
+					std::cout << (int)data.get()[i] << std::endl;
 				}
 			}
 		}
@@ -227,15 +227,21 @@
 	}
 
 	template<typename T>
-	const std::string opNode<T>::getName() const
+	const std::string &opNode<T>::getName() const
 	{
 		return name;
 	}
 
 	template<typename T>
-	const std::vector<int> opNode<T>::getShape() const
+	const std::vector<int> &opNode<T>::getShape() const
 	{
 		return shape;
+	}
+
+	template<typename T>
+	bool opNode<T>::get_initialized() const
+	{
+		return is_initialized;
 	}
 
 	template<typename T>
