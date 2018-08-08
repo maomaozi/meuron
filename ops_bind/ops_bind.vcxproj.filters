@@ -16,6 +16,9 @@
     <Filter Include="源文件\ops">
       <UniqueIdentifier>{65940b48-5500-4486-8a97-91454f1162b0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\cu_ops">
+      <UniqueIdentifier>{4c104a49-8884-4413-89f2-b8f0e78f4c60}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -68,5 +71,10 @@
     <ClCompile Include="ops.cpp">
       <Filter>源文件\ops</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="mat_sum.cu">
+      <Filter>源文件\cu_ops</Filter>
+    </None>
   </ItemGroup>
 </Project>

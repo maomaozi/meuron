@@ -31,13 +31,25 @@ inline Var<DataType>::Var(const std::vector<int>& initShape, std::string name)
 
 	size_t dataSize = _node->getDataSize();
 
-	if (!dataSize) {
+	if (!dataSize) 
+	{
 		printf("Error: Can't allocate memory for %s, error shape\n", name.c_str());
 		return;
 	}
 
 	///  新创建节点时为其分配内存
-	_node->data = std::shared_ptr<DataType>(new DataType[dataSize], [](void *p) { delete [] p; });
+
+#ifdef USE_CUDA
+
+	dataType* tmp = nullptr;
+	cudaMalloc((void **)&tmp, dataSize * sizeof(dataType));
+	_node->data = std::shared_ptr<DataType>(tmp, [](void *p) {cudaFree(tmp); });
+#else
+
+	_node->data = std::shared_ptr<DataType>(new DataType[dataSize], [](void *p) { delete[] p; });
+
+#endif // DEBUG
+
 }
 
 
@@ -52,6 +64,17 @@ void Var<DataType>::init(DataType *data, bool is_ref)
 
 		return;
 	}
+#ifdef USE_CUDA
+
+	if (is_ref)
+	{
+		printf("Error: Var %s can not malloc memory is it's a ref\n", _node->name.c_str());
+		return;
+	}
+
+	CHECK(cudaMemcpy(_node->data.get(), data, _node->dataSize * sizeof(dataType), cudaMemcpyHostToDevice));
+	
+#else
 
 	if (is_ref){
 		/// 如果使用外部数据的引用
@@ -67,6 +90,7 @@ void Var<DataType>::init(DataType *data, bool is_ref)
 		mem[i] = data[i];
 	}
 
+#endif // USE_CUDA
 	_node->has_data = true;
 }
 
@@ -79,6 +103,20 @@ void Var<DataType>::init(const std::initializer_list<DataType> &data){
 		return;
 	}
 
+#ifdef USE_CUDA
+
+	printf("Error: Var %s vacan not support this init on gpu", _node->name.c_str());
+	return;
+	//if (is_ref)
+	//{
+	//	printf("Error: Var %s can not malloc memory is it's a ref\n", _node->name.c_str());
+	//	return;
+	//}
+
+	//CHECK(cudaMemcpy(_node->data.get(), data, _node->dataSize * sizeof(dataType), cudaMemcpyHostToDevice));
+
+#else
+
 	DataType *mem = _node->data.get();
 
 	int i = 0, max_i = _node->getDataSize();
@@ -88,6 +126,7 @@ void Var<DataType>::init(const std::initializer_list<DataType> &data){
 		mem[i] = iter;
 		++i;
 	}
+#endif
 
 	_node->has_data = true;
 }

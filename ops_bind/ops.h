@@ -2,8 +2,6 @@
 
 #include "stdafx.h"
 
-//#define USE_CUDA
-
 template <typename T>
 class opNode;
 

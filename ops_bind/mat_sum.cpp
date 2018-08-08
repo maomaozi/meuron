@@ -1,6 +1,9 @@
 #include "stdafx.h"
-
 #include "ops.h"
+
+#ifdef USE_CUDA
+#include "mat_sum.cu"
+#endif
 
 namespace ops 
 {
@@ -43,6 +46,14 @@ namespace ops
 			return;
 		}
 
+#ifdef USE_CUDA
+		//如果检测到CUDA，分配GPU内存
+		size_t bytes = dataSize * sizeof(dataType);
+		dataType *gpu_result = nullptr;
+		cudaMalloc((dataType**)&gpu_result, bytes);
+		self->data = std::shared_ptr<DataType>(gpu_result, [] (dataType* ptr) {cudaFree(ptr)});
+
+#else
 		/// alloc
 		try
 		{
@@ -56,6 +67,8 @@ namespace ops
 			printf("Error: OOM when allocate %s, size %.2fMB\n", self->name.c_str(), dataSize / 1024.0 / 1024.0);
 			return;
 		}
+#endif // USE_CUDA
+		
 
 		self->dataSize = dataSize;
 		self->is_initialized = true;
@@ -80,15 +93,25 @@ namespace ops
 			return;
 		}
 
-		/// 实际计算
+
 		DataType * res = self->data.get();
 		DataType * lv = lhs->data.get();
 		DataType * rv = rhs->data.get();
 
+#ifdef USE_CUDA
+
+		dim3 block(512);
+		dim3 grid((self->dataSize + block.x - 1) / block.x);
+		vecaddOnDevice << <grid, block >> > (lv, rv, res, self->dataSize);
+
+#else
+		/// 实际计算
 		for (size_t i = 0; i < self->dataSize; ++i) 
 		{
 			res[i] = lv[i] + rv[i];
 		}
+#endif
+
 
 		/// 此节点本次推理已经计算值
 		self->has_data = true;
