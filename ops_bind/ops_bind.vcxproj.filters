@@ -24,8 +24,11 @@
     <CudaCompile Include="mat_sum.cu">
       <Filter>源文件\cu_ops</Filter>
     </CudaCompile>
-    <CudaCompile Include="graph.cpp">
-      <Filter>源文件</Filter>
+    <CudaCompile Include="mat_sum.cpp">
+      <Filter>源文件\ops</Filter>
+    </CudaCompile>
+    <CudaCompile Include="mat_sum.h">
+      <Filter>源文件\ops</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>
@@ -64,9 +67,6 @@
     <ClCompile Include="ops.cpp">
       <Filter>源文件\ops</Filter>
     </ClCompile>
-    <ClCompile Include="mat_sum.cpp">
-      <Filter>源文件\ops</Filter>
-    </ClCompile>
     <ClCompile Include="utils.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -74,6 +74,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="ops_bind.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="graph.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

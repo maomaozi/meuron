@@ -42,7 +42,8 @@ inline Var<DataType>::Var(const std::vector<int>& initShape, std::string name)
 #ifdef USE_CUDA
 
 	DataType* tmp = nullptr;
-	cudaMalloc((void **)&tmp, dataSize * sizeof(DataType));
+	size_t bytes = dataSize * sizeof(DataType);
+	cudaMalloc((void **)&tmp, bytes);
 	_node->data = std::shared_ptr<DataType>(tmp, [](void *p) {cudaFree(p); });
 #else
 

@@ -160,7 +160,7 @@
 				printf("values: ");
 #ifdef USE_CUDA
 				T* result = new T[dataSize];
-				CHECK(cudaMemcpy(data.get(), result, sizeof(T) * dataSize, cudaMemcpyDeviceToHost));
+				CHECK(cudaMemcpy(result, data.get(), sizeof(T) * dataSize, cudaMemcpyDeviceToHost));
 				
 				for (size_t i = 0; i < dataSize; i++)
 				{
