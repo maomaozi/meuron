@@ -8,155 +8,149 @@
 namespace ops 
 {
 
-	// 构图时推断属性
-	template <typename DataType>
-	void op::sum_deduction_property(const opNode<DataType> *lhs, const opNode<DataType> *rhs, opNode<DataType> *self)
+	class sum_op final : public op 
 	{
-
-		/// 无论能否创建节点都先为其命名
-		std::string newName;
-		newName.append("(");
-		newName.append(lhs->name);
-		newName.append(" + ");
-		newName.append(rhs->name);
-		newName.append(")");
-
-		self->setName(std::move(newName));
-
-		/// 检测初始化
-		if (!lhs->is_initialized || !rhs->is_initialized) 
+	public:
+		template <typename T>
+		static void inferer(const opNode<T> *lhs, const opNode<T> *rhs, opNode<T> *self)
 		{
-			printf("Fatal: Can't create node %s from %s, broken node, Aborting...\n", 
-				self->name.c_str(),
-				lhs->is_initialized ? rhs->name.c_str() : lhs->name.c_str()
-			);
+			/// 无论能否创建节点都先为其命名
+			std::string newName;
+			newName.append("(");
+			newName.append(lhs->get_name());
+			newName.append(" + ");
+			newName.append(rhs->get_name());
+			newName.append(")");
 
-			return;
-		}
+			self->set_name(std::move(newName));
 
-		/// 检查shape
-		if (!checkShapeSame(lhs, rhs))	return;
+			/// 检测初始化
+			ABORT_IF_FAILURE(check_initialized(lhs, lhs->get_name()));
+			ABORT_IF_FAILURE(check_initialized(rhs, rhs->get_name()));
 
-		self->shape = lhs->shape;
+			/// 检查shape
+			ABORT_IF_FAILURE(check_shape(lhs, rhs->get_shape()));
 
-		size_t dataSize = shape2size(self->shape);
-		if (dataSize == -1) 
-		{
-			printf("Error: Broken node %s, not support uncertain shape here\n", self->name.c_str());
-			return;
-		}
+			self->set_shape(lhs->get_shape());
 
-#ifdef USE_CUDA
-		//如果检测到CUDA，分配GPU内存
-		size_t bytes = dataSize * sizeof(DataType);
-		DataType *gpu_result = nullptr;
-		CHECK(cudaMalloc((DataType**)&gpu_result, bytes));
-		self->data = std::shared_ptr<DataType>(gpu_result, [](DataType* ptr) {cudaFree(ptr); });
+			size_t data_size = shape_to_size(self->get_shape());
 
-#else
-		/// alloc
-		try
-		{
-			if (self->data == nullptr) 
+			if (data_size == -1)
 			{
-				self->data = std::shared_ptr<DataType>(new DataType[dataSize]);
+				printf("Error: Broken node %s, not support uncertain shape here\n", self->get_name().c_str());
+				return;
 			}
-		}
-		catch (const std::exception&)
-		{
-			printf("Error: OOM when allocate %s, size %.2fMB\n", self->name.c_str(), dataSize / 1024.0 / 1024.0);
-			return;
-		}
+
+#ifdef USE_CUDA
+			//如果检测到CUDA，分配GPU内存
+			size_t bytes = data_size * sizeof(T);
+
+			T *gpu_result = nullptr;
+
+			CHECK(cudaMalloc((T **)&gpu_result, bytes));
+
+			self->get_data() = std::shared_ptr<T>(gpu_result, [](T *ptr) { cudaFree(ptr); });
+
+#else
+			/// alloc
+			try
+			{
+				if (self->data == nullptr)
+				{
+					self->data = std::shared_ptr<T>(new T[data_size]);
+				}
+			}
+			catch (const std::exception&)
+			{
+				printf("Error: OOM when allocate %s, size %.2fMB\n", self->name.c_str(), data_size / 1024.0 / 1024.0);
+				return;
+			}
 #endif // USE_CUDA
-		
 
-		self->dataSize = dataSize;
-		self->is_initialized = true;
-	}
-
-	// 实际计算函数
-	template <typename DataType>
-	void op::sum(const opNode<DataType> *lhs, const opNode<DataType> *rhs, opNode<DataType> *self)
-	{
-		/// 计算两个矩阵element-wise相加
-
-		/// 检查前置节点是否有值
-		if (!lhs->has_data || !rhs->has_data) 
-		{
-			printf("Fatal: Node %s has no data, Aborting...\n", lhs->has_data ? rhs->name.c_str() : lhs->name.c_str());
-			return;
-		}
-
-		if (!lhs->is_initialized || !rhs->is_initialized) 
-		{
-			printf("Fatal: Node %s is broken, Aborting...\n", lhs->is_initialized ? rhs->name.c_str() : lhs->name.c_str());
-			return;
+			self->set_datasize(data_size);
+			self->set_initialized(true);
 		}
 
 
-		DataType *res = self->data.get();
-		DataType *lv = lhs->data.get();
-		DataType *rv = rhs->data.get();
+		template <typename T>
+		static void forward(const opNode<T> *lhs, const opNode<T> *rhs, opNode<T> *self)
+		{
+			/// 计算两个矩阵element-wise相加
+
+			/// 检查前置节点是否有值
+			ABORT_IF_FAILURE(check_has_data(lhs, self->get_name()));
+			ABORT_IF_FAILURE(check_has_data(rhs, self->get_name()));
+
+			T *res	=	self->get_data().get();
+			T *lv	=	lhs->fetch_data().get();
+			T *rv	=	rhs->fetch_data().get();
 
 #ifdef USE_CUDA
 
-		gpuMatAdd(lv, rv, res, self->dataSize);
+			gpu_mat_sum(lv, rv, res, self->get_datasize());
 
 #else
-		/// 实际计算
-		for (size_t i = 0; i < self->dataSize; ++i) 
-		{
-			res[i] = lv[i] + rv[i];
-		}
+			/// 实际计算
+			size_t len = self->get_datasize();
+
+			for (size_t i = 0; i < len; ++i)
+			{
+				res[i] = lv[i] + rv[i];
+			}
 #endif
 
+			/// 此节点本次推理已经计算值
+			self->set_calculated(true);
+		}
 
-		/// 此节点本次推理已经计算值
-		self->has_data = true;
-	}
 
-	// API
-	template<typename T>
-	Var<T> op::matSum(Tensor &lhs, Tensor &rhs)
-	{
-		// 首先产生正确绑定的新节点
-		__Node *lhsNode = lhs.getNode();
-		opNode<T> *lhsOpNode = (opNode<T> *)(lhsNode);
+		template<typename T>
+		static Var<T> mat_sum(Tensor &lhs, Tensor &rhs)
+		{
+			// 首先产生正确绑定的新节点
+			__Node *lhsNode = lhs.getNode();
+			opNode<T> *lhsOpNode = (opNode<T> *)(lhsNode);
 
-		__Node *rhsNode = rhs.getNode();
-		opNode<T> *rhsOpNode = (opNode<T> *)(rhsNode);
+			__Node *rhsNode = rhs.getNode();
+			opNode<T> *rhsOpNode = (opNode<T> *)(rhsNode);
 
-		opNode<T> &res = lhsOpNode->bind(*rhsOpNode, op::sum);
+			opNode<T> &res = lhsOpNode->bind(*rhsOpNode, sum_op::forward);
 
-		// 然后推断新节点的属性
-		// 包括shape name, 然后认为此节点已经初始化完毕
-		op::sum_deduction_property(lhsOpNode, rhsOpNode, &res);
+			// 然后推断新节点的属性
+			// 包括shape name, 然后认为此节点已经初始化完毕
+			sum_op::inferer(lhsOpNode, rhsOpNode, &res);
 
-		return Var<T>(res);
-	}
+			return Var<T>(res);
+		}
+	};
 
 }
 
+//=========================================================================
+
+
+/*
+	如果需要重载基本运算符，这里写定义
+*/
 
 template<typename T>
 opNode<T> &opNode<T>::operator+(opNode<T> &rhsObj)
 {
 	// 首先产生正确绑定的新节点
-	opNode<T> &res = bind(rhsObj, ops::op::sum);
+	opNode<T> &res = bind(rhsObj, ops::sum_op::forward);
 
 	// 然后推断新节点的属性
 	// 包括shape name, 然后认为此节点已经初始化完毕
-	ops::op::sum_deduction_property(this, &rhsObj, &res);
+	ops::sum_op::inferer(this, &rhsObj, &res);
 
 	return res;
 }
 
 
-template<typename DataType>
-inline Var<DataType> Var<DataType>::operator+(Var<DataType>& rhsObj)
+template<typename T>
+inline Var<T> Var<T>::operator+(Var<T>& rhsObj)
 {
-	opNode<DataType> &res = *_node + *rhsObj._node;
+	opNode<T> &res = *_node + *rhsObj._node;
 
-	return Var<DataType>(res);
-	//return res;
+	return Var<T>(res);
 }

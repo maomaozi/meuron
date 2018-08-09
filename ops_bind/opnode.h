@@ -27,20 +27,21 @@ class Const;
 /// __Node 是对内部节点视图的抽象
 class __Node {
 public:
-	virtual const std::string &getName() const = 0;
-	virtual const std::vector<int> &getShape() const = 0;
+	virtual const std::string &get_name() const = 0;
+	virtual const std::vector<int> &get_shape() const = 0;
 	virtual bool get_initialized() const = 0;
-	virtual size_t getDataSize() const = 0;
+	virtual bool get_calculated() const = 0;
+	virtual size_t get_datasize() const = 0;
 
-	virtual const __Node *fetchlhsParent() const = 0;
-	virtual const __Node *fetchrhsParent() const = 0;
+	virtual const __Node *get_lhs_parent() const = 0;
+	virtual const __Node *fetch_rhs_parent() const = 0;
 	virtual const std::unordered_set<std::shared_ptr<__Node>> &fetchNext() const = 0;
 
-	virtual __Node* fetchlhsParent() = 0;
-	virtual __Node* fetchrhsParent() = 0;
+	virtual __Node* get_lhs_parent() = 0;
+	virtual __Node* fetch_rhs_parent() = 0;
 	virtual std::unordered_set<std::shared_ptr<__Node>> &fetchNext() = 0;
 
-	virtual void execHere() = 0;
+	virtual void exec_here() = 0;
 };
 
 
@@ -91,7 +92,7 @@ public:
 	/// 执行具体计算 
 	void exec();
 	/// 仅计算当前节点，而不递归计算前驱
-	void execHere();
+	void exec_here();
 
 	void reset();
 
@@ -100,23 +101,32 @@ public:
 
 /// Getters
 public:
-	const std::string &getName() const;
-	const std::vector<int> &getShape() const;
-	bool get_initialized() const;
-	size_t getDataSize() const;
+
+	std::shared_ptr<T> &opNode<T>::get_data();
+	__Node *get_lhs_parent();
+	__Node *fetch_rhs_parent();
+	std::unordered_set<std::shared_ptr<__Node>> &fetchNext();
 
 	// 常量版本
-	const __Node *fetchlhsParent() const;
-	const __Node *fetchrhsParent() const;
-	const std::unordered_set<std::shared_ptr<__Node>> &fetchNext() const;
+	const	std::string &get_name()			const;
+	const	std::vector<int> &get_shape()	const;
+	bool	get_initialized()				const;
+	size_t	get_datasize()					const;
+	bool	get_calculated()				const;
 
-	__Node *fetchlhsParent();
-	__Node *fetchrhsParent();
-	std::unordered_set<std::shared_ptr<__Node>> &fetchNext();
+	const	__Node *get_lhs_parent()		const;
+	const	__Node *fetch_rhs_parent()		const;
+	const	std::unordered_set<std::shared_ptr<__Node>> &fetchNext()	const;
+
+	const	std::shared_ptr<T> &opNode<T>::fetch_data()					const;
 
 /// Setters
 public:
-	void setName(const std::string &);
+	void set_name(const std::string &);
+	void set_shape(const std::vector<int> &);
+	void set_datasize(size_t);
+	void set_initialized(bool);
+	void set_calculated(bool);
 
 /// 重载的运算符
 public:
@@ -124,8 +134,8 @@ public:
 	bool operator==(const opNode<T> &rhsObj);
 	void operator()();
 
-	template <typename U>
-	opNode<U> &&cast(opNode<T> &rhsObj);
+	//template <typename U>
+	//opNode<U> &&cast(opNode<T> &rhsObj);
 
 	opNode<T> &operator+(opNode<T> &rhsObj);
 
@@ -135,23 +145,23 @@ private:
 
 /// 存储成员
 private:
-	opNode<T> * lhs = nullptr;
-	opNode<T> * rhs = nullptr;
+	opNode<T> *lhs = nullptr;
+	opNode<T> *rhs = nullptr;
 
-	std::shared_ptr<T> data = nullptr;			// 指向所保存数据的智能指针
-	//std::shared_ptr<opNode<T>> next = nullptr;	// 保存指向下一个节点的智能指针，防止析构
+	std::shared_ptr<T> data = nullptr;					// 指向所保存数据的智能指针
+	//std::shared_ptr<opNode<T>> next = nullptr;		// 保存指向下一个节点的智能指针，防止析构
 	/* 考虑到可能出现有多个后继运算符，所以改为set */
 	std::unordered_set<std::shared_ptr<__Node>> next;
 
 	operator_mono_t func_mono = nullptr;
 	operator_bino_t func_bino = nullptr;
 
-	size_t dataSize = 0;					// 总数据长度，根据shape推断，不代表数据实际长度
+	size_t data_size = 0;					// 总数据长度，根据shape推断，不代表数据实际长度
 
 /// 属性
 private:
 	std::vector<int> shape;					// 形状 N, C, W, H
 	std::string name;						// 标识名
-	bool has_data = false;					// 是否在一次推理过程中已经计算当前节点
+	bool is_calculated = false;				// 是否在一次推理过程中已经计算当前节点
 	bool is_initialized = false;			// 是否已经初始化（指属性而不是数据初始化，对于流图内部节点，始终认为已经初始化）
 };

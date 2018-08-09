@@ -29,9 +29,9 @@ inline Var<DataType>::Var(const std::vector<int>& initShape, std::string name)
 	_saver = std::shared_ptr<opNode<DataType>>(new opNode<DataType>(nullptr, initShape, name));
 	_node = _saver.get();
 
-	size_t dataSize = _node->getDataSize();
+	size_t data_size = _node->get_datasize();
 
-	if (!dataSize) 
+	if (!data_size) 
 	{
 		printf("Error: Can't allocate memory for %s, error shape\n", name.c_str());
 		return;
@@ -42,16 +42,16 @@ inline Var<DataType>::Var(const std::vector<int>& initShape, std::string name)
 #ifdef USE_CUDA
 
 	DataType* tmp = nullptr;
-	size_t bytes = dataSize * sizeof(DataType);
+	size_t bytes = data_size * sizeof(DataType);
 	cudaMalloc((void **)&tmp, bytes);
 	_node->data = std::shared_ptr<DataType>(tmp, [](void *p) {cudaFree(p); });
 #else
 
-	_node->data = std::shared_ptr<DataType>(new DataType[dataSize], [](void *p) { delete[] p; });
+	_node->data = std::shared_ptr<DataType>(new DataType[data_size], [](void *p) { delete[] p; });
 
 #endif // DEBUG
 
-	_node->has_data = true;
+	_node->is_calculated = true;
 }
 
 
@@ -61,11 +61,13 @@ inline Var<DataType>::Var(const std::vector<int>& initShape, std::string name)
 template<typename DataType>
 void Var<DataType>::init(DataType *data, bool is_ref)
 {
-	if (!_node->is_initialized) {
+	if (!_node->is_initialized) 
+	{
 		printf("Error: Var %s is broken\n", _node->name.c_str());
 
 		return;
 	}
+
 #ifdef USE_CUDA
 
 	if (is_ref)
@@ -74,31 +76,36 @@ void Var<DataType>::init(DataType *data, bool is_ref)
 		return;
 	}
 
-	CHECK(cudaMemcpy(_node->data.get(), data, _node->dataSize * sizeof(DataType), cudaMemcpyHostToDevice));
+	CHECK(cudaMemcpy(_node->data.get(), data, _node->data_size * sizeof(DataType), cudaMemcpyHostToDevice));
 	
 #else
 
-	if (is_ref){
+	if (is_ref)
+	{
 		/// 如果使用外部数据的引用
 		_node->data = data;
-		_node->has_data = true;
+		_node->is_calculated = true;
 
 		return;
 	}
 
 	DataType *mem = _node->data.get();
 
-	for (size_t i = 0; i < _node->getDataSize(); ++i) {
+	for (size_t i = 0; i < _node->get_datasize(); ++i) 
+	{
 		mem[i] = data[i];
 	}
 
 #endif // USE_CUDA
-	_node->has_data = true;
+
+	_node->is_calculated = true;
 }
 
 
+/*
 template<typename DataType>
-void Var<DataType>::init(const std::initializer_list<DataType> &data){
+void Var<DataType>::init(const std::initializer_list<DataType> &data)
+{
 	if (!_node->is_initialized) {
 		printf("Error: Var %s is broken\n", _node->name.c_str());
 
@@ -107,62 +114,54 @@ void Var<DataType>::init(const std::initializer_list<DataType> &data){
 
 #ifdef USE_CUDA
 
-	DataType *tmp = nullptr;
+	const DataType *tmp = &data[0];
 
-	try
-	{
-		tmp = new DataType[_node->getDataSize()];
-	}
-	catch (const std::exception&)
-	{
-		printf("Error: OOM\n");
-		return;
-	}
-
-	int i = 0, max_i = _node->getDataSize();
-	for (const auto &iter : data) 
-	{
-		if (i > max_i) break;
-		tmp[i] = iter;
-		++i;
-	}
-
-	CHECK(cudaMemcpy(_node->data.get(), tmp, _node->getDataSize() * sizeof(DataType), cudaMemcpyHostToDevice));
-	delete[]tmp;
-
+	CHECK(cudaMemcpy(_node->data.get(), tmp, _node->get_datasize() * sizeof(DataType), cudaMemcpyHostToDevice));
 
 #else
 
 	DataType *mem = _node->data.get();
 
-	int i = 0, max_i = _node->getDataSize();
+	int i = 0, max_i = _node->get_datasize();
 
-	for (const auto &iter : data) {
+	for (const auto &iter : data) 
+	{
 		if (i > max_i) break;
 		mem[i] = iter;
 		++i;
 	}
+
 #endif
 
-	_node->has_data = true;
+	_node->is_calculated = true;
 }
-
+*/
 
 template<typename DataType>
-void init(const std::vector<DataType> &data) {
+void Var<DataType>::init(const std::vector<DataType> &data)
+{
 	if (!_node->is_initialized) {
 		printf("Error: Var %s is broken\n", _node->name.c_str());
 
 		return;
 	}
 
+
+#ifdef USE_CUDA
+	const DataType *tmp = &data[0];
+
+	CHECK(cudaMemcpy(_node->data.get(), tmp, _node->get_datasize() * sizeof(DataType), cudaMemcpyHostToDevice));
+
+#else
 	DataType *mem = _node->data.get();
 
-	for (size_t i = 0; i < _node->getDataSize(); ++i) {
+	for (size_t i = 0; i < _node->get_datasize(); ++i)
+	{
 		mem[i] = data[i];
 	}
+#endif
 
-	_node->has_data = true;
+	_node->is_calculated = true;
 }
 
 //====================================================

@@ -51,7 +51,7 @@ public:
 
 public:
 	void init(DataType *data, bool is_ref=false);
-	void init(const std::initializer_list<DataType> &data);
+	//void init(const std::initializer_list<DataType> &data);
 	void init(const std::vector<DataType> &data);
 
 public:

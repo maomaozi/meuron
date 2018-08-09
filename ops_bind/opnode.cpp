@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "opnode.h"
 
 //===========================================================
 	template<typename T>
@@ -14,7 +15,7 @@
 		rhs = rhsNode.rhs;
 
 		data = rhsNode.data;
-		dataSize = rhsNode.dataSize;
+		data_size = rhsNode.data_size;
 
 		next = rhsNode.next;
 
@@ -23,7 +24,7 @@
 
 		shape = rhsNode.shape;
 		name = rhsNode.name;
-		has_data = rhsNode.has_data;
+		is_calculated = rhsNode.is_calculated;
 		is_initialized = rhsNode.is_initialized;
 	}
 
@@ -33,7 +34,7 @@
 		rhs = rhsNode.rhs;
 
 		data = rhsNode.data;
-		dataSize = rhsNode.dataSize;
+		data_size = rhsNode.data_size;
 
 		next = rhsNode.next;
 
@@ -42,7 +43,7 @@
 
 		shape = rhsNode.shape;
 		name = rhsNode.name;
-		has_data = rhsNode.has_data;
+		is_calculated = rhsNode.is_calculated;
 		is_initialized = rhsNode.is_initialized;
 	}
 
@@ -60,10 +61,10 @@
 			dataSizeAccu *= i;
 		}
 
-		dataSize = dataSizeAccu;
+		data_size = dataSizeAccu;
 
 		if (data) {
-			has_data = true;
+			is_calculated = true;
 		}
 
 		is_initialized = true;
@@ -138,7 +139,7 @@
 	}
 
 	template<typename T>
-	void opNode<T>::execHere()
+	void opNode<T>::exec_here()
 	{
 		if (!lhs) return;
 
@@ -154,22 +155,22 @@
 	{
 		if (is_initialized) 
 		{
-			printf("Node %s\t%s\n", name.c_str(), vecShape2Str(shape).c_str());
-			if (has_data) 
+			printf("Node %s\t%s\n", name.c_str(), vec_shape_to_str(shape).c_str());
+			if (is_calculated) 
 			{
 				printf("values: ");
 #ifdef USE_CUDA
-				T* result = new T[dataSize];
-				CHECK(cudaMemcpy(result, data.get(), sizeof(T) * dataSize, cudaMemcpyDeviceToHost));
+				T *result = new T[data_size];
+				CHECK(cudaMemcpy(result, data.get(), sizeof(T) * data_size, cudaMemcpyDeviceToHost));
 				
-				for (size_t i = 0; i < dataSize; i++)
+				for (size_t i = 0; i < data_size; i++)
 				{
 					std::cout << (int)result[i] << std::endl;
 				}
 
 				delete[]result;
 #else
-				for (size_t i = 0; i < dataSize; ++i) 
+				for (size_t i = 0; i < data_size; ++i) 
 				{
 					std::cout << (int)data.get()[i] << std::endl;
 				}
@@ -209,7 +210,7 @@
 		swap(lhsNode.rhs, rhsNode.rhs);
 
 		swap(lhsNode.data, rhsNode.data);
-		swap(lhsNode.dataSize, dataSize.dataSize);
+		swap(lhsNode.data_size, data_size.data_size);
 
 		swap(lhsNode.next, rhsNode.next);
 
@@ -218,20 +219,20 @@
 
 		swap(lhsNode.name, rhsNode.name);
 		swap(lhsNode.shape, rhsNode.shape);
-		swap(lhsNode.has_data, rhsNode.has_data);
+		swap(lhsNode.is_calculated, rhsNode.is_calculated);
 		swap(lhsNode.is_initialized, rhsNode.is_initialized);
 
 
 	}
 
 	template<typename T>
-	const std::string &opNode<T>::getName() const
+	const std::string &opNode<T>::get_name() const
 	{
 		return name;
 	}
 
 	template<typename T>
-	const std::vector<int> &opNode<T>::getShape() const
+	const std::vector<int> &opNode<T>::get_shape() const
 	{
 		return shape;
 	}
@@ -243,19 +244,38 @@
 	}
 
 	template<typename T>
-	size_t opNode<T>::getDataSize() const 
+	std::shared_ptr<T> &opNode<T>::get_data()
 	{
-		return dataSize;
+		return data;
 	}
 
 	template<typename T>
-	const __Node* opNode<T>::fetchlhsParent() const
+	const std::shared_ptr<T> &opNode<T>::fetch_data() const
+	{
+		return data;
+	}
+
+
+	template<typename T>
+	size_t opNode<T>::get_datasize() const 
+	{
+		return data_size;
+	}
+
+	template<typename T>
+	bool opNode<T>::get_calculated() const
+	{
+		return is_calculated;
+	}
+
+	template<typename T>
+	const __Node* opNode<T>::get_lhs_parent() const
 	{
 		return lhs;
 	}
 
 	template<typename T>
-	const __Node* opNode<T>::fetchrhsParent() const
+	const __Node* opNode<T>::fetch_rhs_parent() const
 	{
 		return rhs;
 	}
@@ -267,13 +287,13 @@
 	}
 
 	template<typename T>
-	__Node *opNode<T>::fetchlhsParent() 
+	__Node *opNode<T>::get_lhs_parent() 
 	{
 		return lhs;
 	}
 
 	template<typename T>
-	__Node *opNode<T>::fetchrhsParent()  
+	__Node *opNode<T>::fetch_rhs_parent()  
 	{
 		return rhs;
 	}
@@ -285,14 +305,38 @@
 	}
 
 	template<typename T>
-	void opNode<T>::setName(const std::string &name) 
+	void opNode<T>::set_name(const std::string &name) 
 	{
 		this->name = name;
+	}
+
+	template<typename T>
+	void opNode<T>::set_shape(const std::vector<int>& shape)
+	{
+		this->shape = shape;
+	}
+
+	template<typename T>
+	void opNode<T>::set_datasize(size_t data_size)
+	{
+		this->data_size = data_size;
+	}
+
+	template<typename T>
+	void opNode<T>::set_initialized(bool is_initialized)
+	{
+		this->is_initialized = is_initialized;
+	}
+
+	template<typename T>
+	void opNode<T>::set_calculated(bool is_calculated)
+	{
+		this->is_calculated = is_calculated;
 	}
 
 
 	template<typename T>
 	void opNode<T>::reset()
 	{
-		this->has_data = false;
+		this->is_calculated = false;
 	}

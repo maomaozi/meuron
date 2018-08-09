@@ -51,8 +51,8 @@ inline void Graph::finalize()
 		std::unordered_set<__Node*> curLayer;
 
 		for (auto node : needToProcess) {
-			if (alreadyProcessed.find(node->fetchlhsParent()) != alreadyProcessed.end() && 
-				alreadyProcessed.find(node->fetchrhsParent()) != alreadyProcessed.end()) {
+			if (alreadyProcessed.find(node->get_lhs_parent()) != alreadyProcessed.end() && 
+				alreadyProcessed.find(node->fetch_rhs_parent()) != alreadyProcessed.end()) {
 				/// Parents are both in the current layer (or one of them is null)
 				curLayer.insert(node);
 			}
@@ -91,9 +91,9 @@ void Graph::run(Tensor *tensor)
 
 	for (size_t i = 0; i < layerNum; ++i) {
 		for (auto &node : nodesLevels[i]) {
-			node->execHere();
+			node->exec_here();
 		}
 	}
 
-	tensor->getNode()->execHere();
+	tensor->getNode()->exec_here();
 }
