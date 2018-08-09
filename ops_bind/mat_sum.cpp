@@ -48,10 +48,10 @@ namespace ops
 
 #ifdef USE_CUDA
 		//如果检测到CUDA，分配GPU内存
-		size_t bytes = dataSize * sizeof(DataType);
-		DataType *gpu_result = nullptr;
-		CHECK(cudaMalloc((DataType**)&gpu_result, bytes));
-		self->data = std::shared_ptr<DataType>(gpu_result, [](DataType* ptr) {cudaFree(ptr); });
+		size_t nBytes = dataSize * sizeof(DataType);
+		DataType *gpuRef = nullptr;
+		CHECK(cudaMalloc((DataType** )&gpuRef, nBytes));
+		self->data = std::shared_ptr<DataType>(gpuRef, [](DataType* ptr) {cudaFree(ptr); });
 
 #else
 		/// alloc
@@ -69,7 +69,6 @@ namespace ops
 		}
 #endif // USE_CUDA
 		
-
 		self->dataSize = dataSize;
 		self->is_initialized = true;
 	}
