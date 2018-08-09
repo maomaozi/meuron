@@ -41,9 +41,9 @@ inline Var<DataType>::Var(const std::vector<int>& initShape, std::string name)
 
 #ifdef USE_CUDA
 
-	dataType* tmp = nullptr;
-	cudaMalloc((void **)&tmp, dataSize * sizeof(dataType));
-	_node->data = std::shared_ptr<DataType>(tmp, [](void *p) {cudaFree(tmp); });
+	DataType* tmp = nullptr;
+	cudaMalloc((void **)&tmp, dataSize * sizeof(DataType));
+	_node->data = std::shared_ptr<DataType>(tmp, [](void *p) {cudaFree(p); });
 #else
 
 	_node->data = std::shared_ptr<DataType>(new DataType[dataSize], [](void *p) { delete[] p; });
@@ -73,7 +73,7 @@ void Var<DataType>::init(DataType *data, bool is_ref)
 		return;
 	}
 
-	CHECK(cudaMemcpy(_node->data.get(), data, _node->dataSize * sizeof(dataType), cudaMemcpyHostToDevice));
+	CHECK(cudaMemcpy(_node->data.get(), data, _node->dataSize * sizeof(DataType), cudaMemcpyHostToDevice));
 	
 #else
 
@@ -106,15 +106,29 @@ void Var<DataType>::init(const std::initializer_list<DataType> &data){
 
 #ifdef USE_CUDA
 
-	printf("Error: Var %s vacan not support this init on gpu", _node->name.c_str());
-	return;
-	//if (is_ref)
-	//{
-	//	printf("Error: Var %s can not malloc memory is it's a ref\n", _node->name.c_str());
-	//	return;
-	//}
+	DataType *tmp = nullptr;
 
-	//CHECK(cudaMemcpy(_node->data.get(), data, _node->dataSize * sizeof(dataType), cudaMemcpyHostToDevice));
+	try
+	{
+		tmp = new DataType[_node->getDataSize()];
+	}
+	catch (const std::exception&)
+	{
+		printf("Error: OOM\n");
+		return;
+	}
+
+	int i = 0, max_i = _node->getDataSize();
+	for (const auto &iter : data) 
+	{
+		if (i > max_i) break;
+		tmp[i] = iter;
+		++i;
+	}
+
+	CHECK(cudaMemcpy(_node->data.get(), tmp, _node->getDataSize() * sizeof(DataType), cudaMemcpyHostToDevice));
+	delete[]tmp;
+
 
 #else
 

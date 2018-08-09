@@ -21,60 +21,60 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
+    <CudaCompile Include="mat_sum.cu">
+      <Filter>源文件\cu_ops</Filter>
+    </CudaCompile>
+    <CudaCompile Include="graph.cpp">
+      <Filter>源文件</Filter>
+    </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
     <ClInclude Include="graph.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="opnode.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="tensor.h">
+    <ClInclude Include="ops.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="utils.h">
+    <ClInclude Include="stdafx.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="tensor.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="types.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="ops.h">
+    <ClInclude Include="utils.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="tensor.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="opnode.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ops.cpp">
+      <Filter>源文件\ops</Filter>
+    </ClCompile>
+    <ClCompile Include="mat_sum.cpp">
+      <Filter>源文件\ops</Filter>
+    </ClCompile>
+    <ClCompile Include="utils.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="ops_bind.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="graph.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="opnode.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="tensor.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="utils.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="mat_sum.cpp">
-      <Filter>源文件\ops</Filter>
-    </ClCompile>
-    <ClCompile Include="ops.cpp">
-      <Filter>源文件\ops</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="mat_sum.cu">
-      <Filter>源文件\cu_ops</Filter>
-    </None>
   </ItemGroup>
 </Project>

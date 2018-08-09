@@ -2,7 +2,8 @@
 #include "ops.h"
 
 #ifdef USE_CUDA
-#include "mat_sum.cu"
+template<class T>
+extern void gpuMatAdd(T* lv, T* rv, T* res, size_t dataSize);
 #endif
 
 namespace ops 
@@ -49,9 +50,9 @@ namespace ops
 #ifdef USE_CUDA
 		//如果检测到CUDA，分配GPU内存
 		size_t bytes = dataSize * sizeof(dataType);
-		dataType *gpu_result = nullptr;
-		cudaMalloc((dataType**)&gpu_result, bytes);
-		self->data = std::shared_ptr<DataType>(gpu_result, [] (dataType* ptr) {cudaFree(ptr)});
+		DataType *gpu_result = nullptr;
+		cudaMalloc((DataType**)&gpu_result, bytes);
+		self->data = std::shared_ptr<DataType>(gpu_result, [](DataType* ptr) {cudaFree(ptr); });
 
 #else
 		/// alloc
@@ -100,9 +101,7 @@ namespace ops
 
 #ifdef USE_CUDA
 
-		dim3 block(512);
-		dim3 grid((self->dataSize + block.x - 1) / block.x);
-		vecaddOnDevice << <grid, block >> > (lv, rv, res, self->dataSize);
+		gpuMatAdd(lv, rv, res, self->dataSize);
 
 #else
 		/// 实际计算

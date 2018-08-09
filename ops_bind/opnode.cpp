@@ -160,12 +160,14 @@
 				printf("values: ");
 #ifdef USE_CUDA
 				T* result = new T[dataSize];
-				CHECK(cudaMemcpy(data.get(), result, sizeof(T) * dataSize, cudaMemcpyHostToDevice));
+				CHECK(cudaMemcpy(data.get(), result, sizeof(T) * dataSize, cudaMemcpyDeviceToHost));
 				
-				for (size_t i = 0; i < data; i++)
+				for (size_t i = 0; i < dataSize; i++)
 				{
 					std::cout << (int)result[i] << std::endl;
 				}
+
+				delete[]result;
 #else
 				for (size_t i = 0; i < dataSize; ++i) 
 				{
