@@ -23,7 +23,7 @@
     <ProjectGuid>{C435EC13-C744-401D-AB22-3DF81D426688}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>opsbind</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -166,6 +166,7 @@
     <CudaCompile Include="mat_sum.cpp" />
     <ClCompile Include="ops.cpp" />
     <ClCompile Include="ops_bind.cpp" />
+    <ClCompile Include="reshape.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
