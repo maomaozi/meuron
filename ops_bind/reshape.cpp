@@ -3,7 +3,6 @@
 
 namespace ops
 {
-
 	class reshape_op final : public op
 	{
 	public:

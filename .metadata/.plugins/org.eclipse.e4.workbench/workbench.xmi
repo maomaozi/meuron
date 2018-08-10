@@ -3,11 +3,12 @@
   <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;workbench>&#xD;&#xA;&lt;mruList/>&#xD;&#xA;&lt;/workbench>"/>
   <tags>activeSchemeId:com.nvidia.viper.acceleratorConfiguration</tags>
   <tags>ModelMigrationProcessor.001</tags>
-  <children xsi:type="basic:TrimmedWindow" xmi:id="_LRHnIpt_EeiuYpOKZDWEAA" elementId="IDEWindow" contributorURI="platform:/plugin/org.eclipse.ui.workbench" selectedElement="_LYkS85t_EeiuYpOKZDWEAA" label="%trimmedwindow.label.eclipseSDK" x="543" y="367" width="1200" height="800">
+  <children xsi:type="basic:TrimmedWindow" xmi:id="_LRHnIpt_EeiuYpOKZDWEAA" elementId="IDEWindow" contributorURI="platform:/plugin/org.eclipse.ui.workbench" selectedElement="_LYkS85t_EeiuYpOKZDWEAA" label="%trimmedwindow.label.eclipseSDK" x="424" y="725" width="1200" height="800">
     <persistedState key="coolBarVisible" value="true"/>
-    <persistedState key="perspectiveBarVisible" value="true"/>
+    <persistedState key="perspectiveBarVisible" value="false"/>
+    <persistedState key="workingSets" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;workingSets/>"/>
+    <persistedState key="aggregateWorkingSetId"/>
     <tags>topLevel</tags>
-    <tags>shellMaximized</tags>
     <children xsi:type="basic:PartSashContainer" xmi:id="_LYkS85t_EeiuYpOKZDWEAA" selectedElement="_LYtc4Jt_EeiuYpOKZDWEAA" horizontal="true">
       <children xsi:type="advanced:PerspectiveStack" xmi:id="_LYtc4Jt_EeiuYpOKZDWEAA" elementId="org.eclipse.ui.ide.perspectivestack" containerData="7500" selectedElement="_Lap9xZt_EeiuYpOKZDWEAA">
         <children xsi:type="advanced:Perspective" xmi:id="_Lap9xZt_EeiuYpOKZDWEAA" elementId="com.nvidia.viper.perspective" selectedElement="_Lap9xpt_EeiuYpOKZDWEAA" label="Profile" iconURI="platform:/plugin/com.nvidia.viper/icons/en/perspective.gif">
@@ -131,7 +132,7 @@
         <tags>ViewMenu</tags>
         <tags>menuContribution:menu</tags>
       </menus>
-      <toolbar xmi:id="_OYJpgZt_EeiuYpOKZDWEAA" elementId="com.nvidia.viper.settingsview"/>
+      <toolbar xmi:id="_OYJpgZt_EeiuYpOKZDWEAA" elementId="com.nvidia.viper.settingsview" visible="false"/>
     </sharedElements>
     <sharedElements xsi:type="basic:Part" xmi:id="_Lap9xJt_EeiuYpOKZDWEAA" elementId="com.nvidia.viper.timelinepropertyview" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="Properties" iconURI="platform:/plugin/com.nvidia.viper.application/icons/properties_view.gif" closeable="true">
       <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;view/>"/>

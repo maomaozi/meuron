@@ -1,3 +1,4 @@
 CollectTimeline=Always
-ExecutablePath=F\:\\meuron\\x64\\Debug
+ExecutablePath=F\:\\meuron\\x64\\Release
+ShowNvprofWarningInfo=Never
 eclipse.preferences.version=1

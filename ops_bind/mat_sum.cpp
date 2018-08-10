@@ -87,7 +87,8 @@ namespace ops
 
 #ifdef USE_CUDA
 
-			gpu_mat_sum(lv, rv, res, self->get_datasize());
+			//gpu_mat_sum(lv, rv, res, self->get_datasize());
+			gpu_mat_sum2(lv, rv, res, self->get_datasize(), 0);
 
 #else
 			///  µº º∆À„
