@@ -29,25 +29,6 @@
 	}
 
 	template<typename T>
-	opNode<T>::opNode(opNode<T> &&rhsNode) {
-		lhs = rhsNode.lhs;
-		rhs = rhsNode.rhs;
-
-		data = rhsNode.data;
-		data_size = rhsNode.data_size;
-
-		next = rhsNode.next;
-
-		func_mono = rhsNode.func_mono;
-		func_bino = rhsNode.func_bino;
-
-		shape = rhsNode.shape;
-		name = rhsNode.name;
-		is_calculated = rhsNode.is_calculated;
-		is_initialized = rhsNode.is_initialized;
-	}
-
-	template<typename T>
 	opNode<T>::opNode(T *initData, const std::vector<int> &initShape, const std::string &initName) : data(initData), name(initName), shape(initShape)
 	{
 		size_t dataSizeAccu = 1;
@@ -95,9 +76,9 @@
 	template<typename T>
 	opNode<T> &opNode<T>::bind(opNode<T> &rhsObj, operator_bino_t op)
 	{
-		// Ë«Ä¿bind, ÔÚÁ½¸öÇ°Çı½ÚµãÉÏ±£´æºó¼Ì½Úµã
-		// Èç¹û²»±£´æÕâ¸öshared_ptr£¬µ±º¯Êı·µ»ØºóÒıÓÃ¼ÆÊıÎª0
-		// ¶ÔÓÚÁ÷Í¼ÄÚ²¿°ó¶¨²úÉúµÄ½Úµã£¬ÔÚÍê³É×îÖÕÊôĞÔÍÆ¶ÏºóÈÏÎªÆäÒÑ¾­³õÊ¼»¯
+		// åŒç›®bind, åœ¨ä¸¤ä¸ªå‰é©±èŠ‚ç‚¹ä¸Šä¿å­˜åç»§èŠ‚ç‚¹
+		// å¦‚æœä¸ä¿å­˜è¿™ä¸ªshared_ptrï¼Œå½“å‡½æ•°è¿”å›åå¼•ç”¨è®¡æ•°ä¸º0
+		// å¯¹äºæµå›¾å†…éƒ¨ç»‘å®šäº§ç”Ÿçš„èŠ‚ç‚¹ï¼Œåœ¨å®Œæˆæœ€ç»ˆå±æ€§æ¨æ–­åè®¤ä¸ºå…¶å·²ç»åˆå§‹åŒ–
 
 		//next = std::shared_ptr<opNode<T>>(new opNode<T>(this, &rhsObj, op));
 		//rhsObj.next = next;
@@ -113,9 +94,9 @@
 	template<typename T>
 	opNode<T> &opNode<T>::bind(operator_mono_t op)
 	{
-		// µ¥Ä¿bind
-		// ´¦ÀíÀàËÆÓÚË«Ä¿ÔËËã
-		// ¶ÔÓÚÁ÷Í¼ÄÚ²¿°ó¶¨²úÉúµÄ½Úµã£¬ÔÚÍê³É×îÖÕÊôĞÔÍÆ¶ÏºóÈÏÎªÆäÒÑ¾­³õÊ¼»¯
+		// å•ç›®bind
+		// å¤„ç†ç±»ä¼¼äºåŒç›®è¿ç®—
+		// å¯¹äºæµå›¾å†…éƒ¨ç»‘å®šäº§ç”Ÿçš„èŠ‚ç‚¹ï¼Œåœ¨å®Œæˆæœ€ç»ˆå±æ€§æ¨æ–­åè®¤ä¸ºå…¶å·²ç»åˆå§‹åŒ–
 		//next = std::shared_ptr<opNode<T>>(new opNode<T>(this, op));
 		auto newNode = std::shared_ptr<opNode<T>>(new opNode<T>(this, op));
 		next.insert(newNode);
@@ -191,7 +172,7 @@
 	template<typename T>
 	bool opNode<T>::operator==(const opNode<T> & rhsNode)
 	{
-		// TODO: ÅĞ¶¨ĞÎ×´
+		// TODO: åˆ¤å®šå½¢çŠ¶
 		return &data == &(rhsNode.data);
 	}
 
