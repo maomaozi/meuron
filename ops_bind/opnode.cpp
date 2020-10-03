@@ -191,7 +191,7 @@
 		swap(lhsNode.rhs, rhsNode.rhs);
 
 		swap(lhsNode.data, rhsNode.data);
-		swap(lhsNode.data_size, data_size.data_size);
+		swap(lhsNode.data_size, rhsNode.data_size);
 
 		swap(lhsNode.next, rhsNode.next);
 
